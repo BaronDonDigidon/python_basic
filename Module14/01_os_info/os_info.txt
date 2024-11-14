@@ -1,0 +1,4 @@
+OS info is 
+uname_result(system='Windows', node='DESKTOP-7K9NHHJ', release='10', version='10.0.19045', machine='AMD64')
+
+Python version is 3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)] ('64bit', 'WindowsPE')
