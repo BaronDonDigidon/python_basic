@@ -1,13 +1,16 @@
 films: list[str] = ['Крепкий орешек', 'Назад в будущее', 'Таксист',
          'Леон', 'Богемская рапсодия', 'Город грехов',
          'Мементо', 'Отступники', 'Деревня']
+films_lower: list[str] = [film_title.lower() for film_title in films]
 lover_films: list[str] = []
 
 
+
+
 def choose_films(film: str):
-    if film in films:
-        return lover_films.append(films[films.index(film)])
-    return print(f"Ошибка фильма {film} у нас нет")
+    if film.lower() in films_lower:
+        return lover_films.append(films[films_lower.index(film.lower())])
+    return print(f"Ошибка: фильма {film} у нас нет")
 
 
 
