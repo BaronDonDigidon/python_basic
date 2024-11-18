@@ -8,6 +8,13 @@ lover_films: list[str] = []
 
 
 def choose_films(film: str):
+    """Метод сравнивает название запрашиваемого фильма с фильмом в списке.
+    Если фильм есть в списке добавляет его в список избранных фильмов,
+    ином случае выводи сообщение об ошибке.
+    Аргумент film - название фильма которое требуется добавить в список избранных
+    """
+
+
     if film.lower() in films_lower:
         return lover_films.append(films[films_lower.index(film.lower())])
     return print(f"Ошибка: фильма {film} у нас нет")
