@@ -1,4 +1,11 @@
 def input_control(num: int, control_list: list[int]) -> None | str:
+    """
+    Функция осуществляет контроль ввода, не позволяя пользователю при создании списка вводить числа больше 200
+    и последующие числа не больше предыдущего.
+    :param num: вес контейнера
+    :param control_list: список контейнеров
+    :return: возвращает в список значение веса контейнера или выводит сообщение об ошибке
+    """
     if num <= 200:
         if len(control_list) == 0:
             return control_list.append(num)
@@ -12,6 +19,14 @@ def input_control(num: int, control_list: list[int]) -> None | str:
 
 
 def container_number_looking(length_list: int, weight_new_object: int, search_list: int) -> int:
+    """
+    Определяет номер под котороым должен будет стоять новый контейнер.
+
+    :param length_list: длина списка (кол-во контейнеров в созданом ранее списке)
+    :param weight_new_object: вес нового контейнера
+    :param search_list: список контейнеров
+    :return: возвращает номер под которым должен стоять новый контейнер
+    """
     for place_number in range(length_list):
         if search_list[place_number] < weight_new_object:
             new_place_number = place_number + 1
