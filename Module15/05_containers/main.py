@@ -20,7 +20,7 @@ def input_control(num: int, control_list: list[int]) -> None | str:
 
 def container_number_looking(length_list: int, weight_new_object: int, search_list: int) -> int:
     """
-    Определяет номер под котороым должен будет стоять новый контейнер.
+    Функция определяет номер под которым должен будет стоять новый контейнер.
 
     :param length_list: длина списка (кол-во контейнеров в созданом ранее списке)
     :param weight_new_object: вес нового контейнера
@@ -51,5 +51,3 @@ while True:
         break
     else:
         print("Вес контейнера должен не превышать 200")
-
-
