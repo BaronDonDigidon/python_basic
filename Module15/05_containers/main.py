@@ -2,9 +2,9 @@ def input_control(num: int, control_list: list[int]) -> None | str:
     """
     Функция осуществляет контроль ввода, не позволяя пользователю при создании списка вводить числа больше 200
     и последующие числа не больше предыдущего.
-    :param num: вес контейнера
-    :param control_list: список контейнеров
-    :return: возвращает в список значение веса контейнера или выводит сообщение об ошибке
+    :param num: Вес контейнера.
+    :param control_list: Список контейнеров.
+    :return: Возвращает в список значение веса контейнера или выводит сообщение об ошибке.
     """
     if num <= 200:
         if len(control_list) == 0:
@@ -21,7 +21,6 @@ def input_control(num: int, control_list: list[int]) -> None | str:
 def container_number_looking(length_list: int, weight_new_object: int, search_list: int) -> int:
     """
     Функция определяет номер под которым должен будет стоять новый контейнер.
-
     :param length_list: длина списка (кол-во контейнеров в созданом ранее списке)
     :param weight_new_object: вес нового контейнера
     :param search_list: список контейнеров
@@ -37,17 +36,22 @@ def container_number_looking(length_list: int, weight_new_object: int, search_li
 
 
 
+def main() -> None:
+    number_containers: int = int(input("Введите количество контейнеров: "))
+    containers_list: list[int] = []
+    while number_containers != len(containers_list):
+        container_weight: int  = int(input("Введите вес контейнера: "))
+        input_control(container_weight, containers_list)
+    while True:
+        new_container_wieght: int = int(input("\nВведите вес нового контейнера: "))
+        if new_container_wieght <= 200:
+            print(f"\nНомер, который получит новый контейнер: "
+                  f"{container_number_looking(number_containers, new_container_wieght, containers_list)}")
+            break
+        else:
+            print("Вес контейнера должен не превышать 200")
 
-number_containers: int = int(input("Введите количество контейнеров: "))
-containers_list: list[int] = []
-while number_containers != len(containers_list):
-    container_weight: int  = int(input("Введите вес контейнера: "))
-    input_control(container_weight, containers_list)
-while True:
-    new_container_wieght: int = int(input("\nВведите вес нового контейнера: "))
-    if new_container_wieght < 200:
-        print(f"\nНомер, который получит новый контейнер: "
-              f"{container_number_looking(number_containers, new_container_wieght, containers_list)}")
-        break
-    else:
-        print("Вес контейнера должен не превышать 200")
+
+
+
+main()
