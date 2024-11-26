@@ -37,6 +37,11 @@ def container_number_looking(length_list: int, weight_new_object: int, search_li
 
 
 def main() -> None:
+    """
+    Функция запрашивает количество контейнеров, создает список с помощью функции input_control, запрашивает вес
+    нового контейнера и определяет его номер с помощью функции container_number_looking.
+    :return: None
+    """
     number_containers: int = int(input("Введите количество контейнеров: "))
     containers_list: list[int] = []
     while number_containers != len(containers_list):
