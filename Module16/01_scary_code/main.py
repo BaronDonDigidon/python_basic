@@ -1,24 +1,40 @@
-a = [1, 5, 3]
-b = [1, 5, 1, 5]
-c = [1, 3, 1, 5, 3, 3]
-for i in b:
-    a.append(i)
-t = 0
-for i in a:
-    if i == 5:
-        t += 1
-print(t)
-d = []
-for i in a:
-    if i != 5:
-        d.append(i)
-for i in c:
-    d.append(i)
-t = 0
-for i in d:
-    if i == 3:
-        t += 1
-print(t)
-print(d)
+basic_list = [1, 5, 3]
+side_list_1 = [1, 5, 1, 5]
+side_list_2 = [1, 3, 1, 5, 3, 3]
 
-# TODO переписать программу
+def list_extender_and_delet_search_num(basic_list: list[int], side_list: list[int],
+                                       delete_num: int, key: int = 1) -> int:
+    """
+    Функция объединяет два списка после чего находит искомое число, если ключ
+    равен 1 удаляет заданные числа из объединенного списка.
+    :param basic_list: базовый список чисел
+    :param side_list: побочный список чисел
+    :param delete_num: искомое число
+    :param key: ключ
+    :return: количество искомых чисел в списке
+    """
+    basic_list.extend(side_list)
+    counter_delete_num: int = basic_list.count(delete_num)
+    if key:
+        while delete_num in basic_list:
+            basic_list.remove(delete_num)
+    return counter_delete_num
+
+
+
+
+def displayer() -> None:
+    """
+    Функция использует фунцкию list_extender_and_delet_search_num и выводит на экран количество искомых чисел,
+    после двух операций объединения вывовдит итоговый список.
+    :return:
+    """
+    print(f"Количество цифр 5 при первом объединении"
+          f" {list_extender_and_delet_search_num(basic_list, side_list_1, 5, 1)}")
+    print(f"Количество цифр 3 при втором объединении"
+          f" {list_extender_and_delet_search_num(basic_list, side_list_2, 3, 0)}")
+    print(f"Итоговый список: {basic_list}")
+
+
+
+displayer()
