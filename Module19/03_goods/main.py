@@ -1,3 +1,5 @@
+from typing import Union, Dict
+
 goods = {
     'Лампа': '12345',
     'Стол': '23456',
@@ -24,4 +26,26 @@ store = {
     ],
 }
 
-# TODO здесь писать код
+
+
+
+def store_calculator(goods_dict: Dict[str, int], store_dict: Dict[str, Union[list, Dict[str, int]]]) -> None:
+    """
+    Подсчитывает общее количество и стоимость товаров в магазине на основе предоставленных данных.
+    :param goods_dict: Словарь с кодами товаров.
+    :param store_dict: Словарь со списками кол-ва разнообразных товаров.
+    :return: None. Функция выводит на экран информацию о количестве и стоимости товаров.
+    Если товар отсутствует в магазине, выводится соответствующее сообщение.
+    """
+    for key, value in goods_dict.items():
+        if value in store_dict.keys():
+            quantity = sum(item['quantity'] for item in store_dict[value])
+            price = sum(item['price'] * item['quantity'] for item in store_dict[value])
+            print("{0} - {1} штук, стоимость {2} рубля".format(key, quantity, price))
+        else:
+            print("{0} - отсутствует в магазине".format(key))
+
+
+
+
+store_calculator(goods, store)
