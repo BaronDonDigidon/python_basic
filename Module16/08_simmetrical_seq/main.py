@@ -8,6 +8,7 @@ def building_a_symmetrical_sequence(numbers: int, numbers_list: list[int], num_l
     """
     for i in range(numbers):
         numbers_list.insert(numbers, numbers_list[i])
+        print(numbers_list[i], i)
         num_list.append(numbers_list[i])
         if numbers_list == numbers_list[:: -1]:
             print(f"Нужно приписать чисел: {i + 1}")
