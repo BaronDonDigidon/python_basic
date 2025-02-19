@@ -1,4 +1,5 @@
-students = {
+from typing import List, Dict, Tuple, Any
+students: Dict[int, Dict[str, Any]] = {
     1: {
         'name': 'Bob',
         'surname': 'Vazovski',
@@ -20,25 +21,38 @@ students = {
 }
 
 
-def f(dict):
-    lst = []
-    string = ''
-    for i in dict:
-        lst += (dict[i]['interests'])
-        string += dict[i]['surname']
-    cnt = 0
-    for s in string:
-        cnt += 1
-    return lst, cnt
 
 
-pairs = []
-for i in students:
-    pairs += (i, students[i]['age'])
+def students_looking(students_dict: Dict[int, Dict[str, Any]], surname_length: int = 0,
+                     list_interests: List[str] = []) -> Tuple[List[str], int]:
+    """
+    Принимает в качестве аргумента словарь и возвращает два значения: полный список интересов
+    всех студентов и общую длину всех фамилий студентов.
+    :param students_dict: словарь с информацицией по студентам
+    :param surname_length: общую длину всех фамилий студентов
+    :param list_interests: полный список интересов всех студентов
+    :return:
+    """
+    if list_interests is None:
+        list_interests = []
 
 
-my_lst = f(students)[0]
-l = f(students)[1]
-print(my_lst, l)
+    for i_value in students_dict.values():
+        for interests in i_value['interests']:
+            list_interests.append(interests)
+        surname_length += len(i_value['surname'])
 
-# TODO исправить код
+
+    return list_interests, surname_length
+
+
+
+# Список пар "ID студента — возраст"
+list_duos: list[tuple[int, int]] = [(i_key, i_value["age"]) for i_key, i_value in students.items()]
+print(f"Список пар 'ID студента — возраст': {list_duos}")
+
+
+# Получение данных о студентах
+studens_data = students_looking(students)
+print(f"Полный список интересов всех студентов: {set(studens_data[0])}")
+print(f"Общая длина всех фамилий студентов: {studens_data[1]}")
