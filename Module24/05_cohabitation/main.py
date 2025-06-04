@@ -8,6 +8,22 @@ class House:
         self.food: int = 50     # Еда в холодильнике
         self.money: int = 0     # Деньги в тумбочке
 
+    def live_one_year(self, *residents: 'Person') -> None:
+        """
+        Симуляция проживания всех жильцов в доме в течение 365 дней.
+        :param residents: жильцы дома (экземпляры класса Person)
+        """
+        for day in range(1, 366):
+            print(f"\nДень {day}")
+            all_alive = True
+            for person in residents:
+                if not person.live_one_day():
+                    print(f"{person.name} погиб.")
+                    all_alive = False
+            if not all_alive and all(not person.satiety > 0 for person in residents):
+                print("Все умерли... Эксперимент окончен.")
+                break
+
 
 class Person:
     def __init__(self, name: str, house: House) -> None:
@@ -87,25 +103,13 @@ class Person:
 
 def main() -> None:
     """
-    Основная функция симуляции жизни двух людей в течение 365 дней.
+    Основная функция симуляции жизни двух людей в течение 365 дней через метод класса House.
     """
     home: House = House()
     person1: Person = Person("Артем", home)
     person2: Person = Person("Оля", home)
 
-    for day in range(1, 366):
-        print(f"\nДень {day}")
-        alive1: bool = person1.live_one_day()
-        alive2: bool = person2.live_one_day()
-
-        # Проверка, кто жив, а кто нет
-        if not alive1 and not alive2:
-            print("Все умерли... Эксперимент окончен.")
-            break
-        elif not alive1:
-            print(f"{person1.name} погиб. {person2.name} жив.")
-        elif not alive2:
-            print(f"{person2.name} погиб. {person1.name} жив.")
+    home.live_one_year(person1, person2)
 
 if __name__ == "__main__":
     main()
