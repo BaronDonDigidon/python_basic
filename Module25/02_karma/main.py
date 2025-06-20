@@ -2,6 +2,7 @@ from typing import Final, TextIO
 from random import randint, choice
 
 class LifeException(Exception):
+    """Базовый класс для исключений жизни"""
     def __init__(self, message: str = "Произошла ошибка в жизненном цикле"):
         self.message = message
         super().__init__(message)
@@ -94,6 +95,8 @@ class User:
         :param name: очки кармы
         :type name: str
         """
+        if not isinstance(name, str):
+            raise ValueError("Имя должно быть строкой")
         self.__name = name
 
 
@@ -114,9 +117,7 @@ class Enlightenment:
         :return: True or False
         :rtype: bool
         """
-        if randint(1, 10) == 1:
-            return True
-        return False
+        return randint(1, 10) == 1
 
 
     @staticmethod
@@ -134,53 +135,82 @@ class Enlightenment:
             DepressionError()
         ])
 
-
-    def one_day(self, user_data: User, karma_loge: TextIO, day: int) -> None:
+    @staticmethod
+    def log_error(file: TextIO, day: int, user: User, exc: LifeException) -> None:
         """
-        Запускает де
+        Выводит сообщение об ошибки в день получения кармы и записывает ее в лог файл.
+        :param file: лог файл с ошибками.
+        :type file: TextIO
+        :param day: номер дня на пути к проствелению
+        :type day: int
+        :param user: пользователь
+        :type user: User
+        :param exc: исключения в жизни
+        :type exc: LifeException
+        :return:
+        """
+        message = (f"День {day}. У пользователя {user.name} возникла ошибка: "
+                   f"{exc.__class__.__name__} - {exc}")
+        print(message)
+        file.write(message + "\n")
+
+
+    def karma_announcement(self, user_data: User, day: int) -> None:
+        """
+        Анонсирует изменение кармы.
         :param user_data: данные пользователя
         :type user_data: User
-        :param karma_loge: лог файл для записи ошибок
-        :type karma_loge: TextIO
         :param day: день на пути к просветлению
         :type day: int
         """
-        try:
-            if self.probability_exception():
-                raise self.random_exception_choice()
-            else:
-                user_data.karma_point += randint(1,  7)
+        if user_data.karma_point < self.KARMA_CONSTANT:
+            print(f"День {day} пути к просветлению. Карма пользователя  "
+                  f"{user_data.name}: {user_data.karma_point}")
+        else:
+            print(f"Поздравляю {user_data.name} вы достигли просветления за {day} дней! "
+                  f"Ваша карма равна {user_data.karma_point}.")
 
+    def karma_value_protect(self, user_data: User) -> None:
+        """
+        Защищает значение кармы от превышения константы KARMA_CONSTANT
+        :param user_data: данные пользователя
+        :type user_data: User
+        """
+        if user_data.karma_point > self.KARMA_CONSTANT:
+            user_data.karma_point = self.KARMA_CONSTANT
 
-                # Защита от перенасыщения кармы
-                if user_data.karma_point < self.KARMA_CONSTANT:
-                    print(f"День {day} пути к просветлению. Карма пользователя  "
-                          f"{user_data.name}: {user_data.karma_point}")
-                else:
-                    user_data.karma_point = self.KARMA_CONSTANT
-                    print(f"Поздравляю {user_data.name} вы достигли просветления за {day} дней! "
-                          f"Ваша карма равна {user_data.karma_point}.")
+    def one_day(self) -> LifeException | int:
+        """
+        Возвращает количество очков кармы от 1 до 7 или выдает ошибку с вероятность. 10%
+        """
+        if self.probability_exception():
+            raise self.random_exception_choice()
+        else:
+            return randint(1,  7)
 
-
-        except LifeException as exc:
-            karma_loge.write(f"День {day}. У пользователя {user_data.name} возникла ошибка: "
-                             f"{exc.__class__.__name__} - {exc}\n")
-            print(f"День {day}. У пользователя {user_data.name} возникла ошибка: "
-                  f"{exc.__class__.__name__} - {exc}")
 
 
 def main():
-    # ЗАпрашиваем имя пользователя
+    enlightenment_path = Enlightenment()
+    # Запрашиваем имя пользователя
     user_name: str = input("Введите имя пользователя: ").strip()
     user: User = User(user_name)
     day: int = 1
 
-
     with open("karma.log", "w", encoding="UTF-8") as file_log:
-        while user.karma_point < Enlightenment().KARMA_CONSTANT:
-            Enlightenment().one_day(user, file_log, day)
-            if user.karma_point < Enlightenment.KARMA_CONSTANT:
-                day += 1
+        while user.karma_point < enlightenment_path.KARMA_CONSTANT:
+            try:
+                # Вычисляем количество полученной сегодня кармы или получаем ошибку
+                karma_today = enlightenment_path.one_day()
+                user.karma_point += karma_today
+                # Защита кармы от перенасыщения
+                enlightenment_path.karma_value_protect(user)
+                # Анонсируем изменение кармы
+                enlightenment_path.karma_announcement(user, day)
+            except LifeException as exc:
+                # Запись ошибки в файл
+                enlightenment_path.log_error(file_log, day, user, exc)
+            day += 1
 
 
 if __name__ == "__main__":
