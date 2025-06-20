@@ -275,6 +275,7 @@ def main():
     type_property.worth = worth
     # Расчитываем налог который требуется уплатить
     tax: float | None = type_property.calculates_the_tax()
+
     if user.pay(tax):
         print(f"Налог уплачен, оставшиеся денежные средства: {user.money:.2f} коин(а)")
     else:
