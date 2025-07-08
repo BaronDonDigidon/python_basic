@@ -1,5 +1,5 @@
-import random
-
+from typing import Optional
+from monsters import MonsterHunter, Monster
 
 class Hero:
     # Базовый класс, который не подлежит изменению
@@ -69,12 +69,12 @@ class Healer(Hero):
     Класс целитель. Родитель Герой.
     """
     # Целитель:
-    def __str__(self):
+    def __str__(self) -> str:
         return 'Name: {0} | HP: {1}'.format(self.name, self.get_hp())
 
 
     # Атрибуты:
-    def __init__(self, name):
+    def __init__(self, name: Optional[str]) -> None:
         super().__init__(name)
 
 
@@ -83,29 +83,48 @@ class Healer(Hero):
 
 
     # Методы:
-    # - атака - может атаковать врага, но атакует только в половину силы self.__power
-    def attack(self, target):
+    def attack(self, target: Monster) -> None:
+        """
+        Может атаковать врага, но атакует только в половину силы self.__power.
+        :param target: цель атаки
+        :type target: Monster
+        """
         target.take_damage(self.get_power() / 2)
 
 
-    # - получение урона - т.к. защита целителя слаба - он получает на 20% больше урона (1.2 * damage)
-    def take_damage(self, damage):
-        self.set_hp(self.get_hp() - damage)
+
+    def take_damage(self, damage: float) -> None:
+        """
+        Т.к. защита целителя слаба - он получает на 20% больше урона (1.2 * damage).
+        :param damage: получаемый урон
+        :type damage: int
+        """
+        self.set_hp(self.get_hp() - damage * 1.2)
         super().take_damage(damage)
 
 
-    # - исцеление - увеличивает здоровье цели на величину равную своей магической силе
-    def healing(self, target):
+    def healing(self, target: Hero) -> None:
+        """
+        Увеличивает здоровье цели на величину равную своей магической силе.
+        :param target: цель исцеления
+        :type target: Hero
+        """
         target.set_hp(self.get_hp() + self.magic_power)
 
 
-    # - выбор действия - получает на вход всех союзников и всех врагов и на основе своей стратегии выполняет ОДНО из действий (атака,
-    # исцеление) на выбранную им цель
-    def make_a_move(self, friends, enemies):
+    def make_a_move(self, friends: list[Hero], enemies: list[Monster]) -> None:
+        """
+        Получает на вход всех союзников и всех врагов и на основе своей стратегии выполняет ОДНО из действий
+        (атака, исцеление) на выбранную им цель.
+        :param friends: список союзников
+        :type friends: list[Hero]
+        :param enemies: список монстров
+        :type enemies: list[Monster]
+        """
         super().make_a_move(friends, enemies)
         print(self.name, end=' ')
-        target_of_healing = friends[0]
-        min_health = target_of_healing.get_hp()
+        target_of_healing: Hero = friends[0]
+        min_health: float = target_of_healing.get_hp()
         for friend in friends:
             if friend.get_hp() < min_health:
                 target_of_healing = friend
@@ -114,14 +133,26 @@ class Healer(Hero):
         if not enemies:
             return
 
-        if min_health < 60:
+
+        target: Monster = enemies[0]
+        weak_target_health: float = target.get_hp()
+        for weak_enemy in enemies:
+            if isinstance(weak_enemy, MonsterHunter) and weak_target_health <= target.get_hp():
+                target = weak_enemy
+                weak_target_health = target.get_hp()
+            else:
+                target = weak_enemy
+                weak_target_health = target.get_hp()
+
+
+        if min_health < 100:
             print("Исцеляю", target_of_healing.name)
             self.healing(target_of_healing)
         else:
             if not enemies:
                 return
-            print("Атакую ближнего -", enemies[0].name)
-            self.attack(enemies[0])
+            print("Атакую ближнего -", target.name)
+            self.attack(target)
         print('\n')
 
 
@@ -130,64 +161,100 @@ class Tank(Hero):
     Класс Танк. Родитель Герой.
     """
     # Танк:
-    def __str__(self):
+    def __str__(self) -> str:
         return 'Name: {0} | HP: {1}'.format(self.name, self.get_hp())
     # Атрибуты:
-    def __init__(self, name):
+    def __init__(self, name: Optional[str]) -> None:
         super().__init__(name)
     # - показатель защиты - изначально равен 1, может увеличиваться и уменьшаться
         self.armor = 1
     # - поднят ли щит - танк может поднимать щит, этот атрибут должен показывать поднят ли щит в данный момент
         self.shield_status = False
     # Методы:
-    # - атака - атакует, но т.к. доспехи очень тяжелые - наносит половину урона (self.__power)
-    def attack(self, target):
+    def attack(self, target: Monster) -> None:
+        """
+        Атакует, но т.к. доспехи очень тяжелые - наносит половину урона (self.__power).
+        :param target: цель атаки.
+        :type target: Monster
+        """
         if self.shield_status:
-            real_attack = self.get_power() / 2 / 2
+            real_attack: float = self.get_power() / 2 / 2
         else:
-            real_attack = self.get_power() / 2
+            real_attack: float = self.get_power() / 2
         target.take_damage(real_attack)
 
 
-    # - получение урона - весь входящий урон делится на показатель защиты (damage/self.defense) и только потом отнимается от здоровья
-    def take_damage(self, damage):
-        real_damage = damage / self.armor
+    def take_damage(self, damage: float) -> None:
+        """
+        Весь входящий урон делится на показатель защиты (damage/self.defense) и только потом отнимается от здоровья.
+        :param damage: получаемый урон
+        :type damage: int
+        """
+        real_damage: float = damage / self.armor
         self.set_hp(self.get_hp() - real_damage)
         super().take_damage(real_damage)
-    # - поднять щит - если щит не поднят - поднимает щит. Это увеличивает показатель брони в 2 раза, но уменьшает показатель силы в 2 раза.
-    def shield_up(self):
+
+
+    def shield_up(self) -> None:
+        """
+        Если щит не поднят - поднимает щит.
+        Это увеличивает показатель брони в 2 раза, но уменьшает показатель силы в 2 раза.
+        """
         self.shield_status = True
         self.armor *= 2
-    # - опустить щит - если щит поднят - опускает щит. Это уменьшает показатель брони в 2 раза, но увеличивает показатель силы в 2 раза.
+
+
     def shield_down(self):
+        """
+        Если щит поднят - опускает щит.
+        Это уменьшает показатель брони в 2 раза, но увеличивает показатель силы в 2 раза.
+        """
         self.shield_status = False
         self.armor /= 2
-    # - выбор действия - получает на вход всех союзников и всех врагов и на основе своей стратегии выполняет ОДНО из действий (атака,
-    # поднять щит/опустить щит) на выбранную им цель
-    def make_a_move(self, friends, enemies):
+
+
+    def make_a_move(self, friends: list[Hero], enemies: list[Monster]):
+        """
+        Получает на вход всех союзников и всех врагов и на основе своей стратегии выполняет ОДНО
+        из действий (атака, поднять щит/опустить щит) на выбранную им цель
+        :param friends: список союзников.
+        :type friends: list[Hero]
+        :param enemies: список врагов.
+        :type enemies: list[Monster]
+        """
         super().make_a_move(friends, enemies)
         print(self.name, end=' ')
 
         if not enemies:
             return
 
-        if self.get_hp() < 70:
+        target: Monster = enemies[0]
+        weak_target_health: float = target.get_hp()
+        for weak_enemy in enemies:
+            if isinstance(weak_enemy, MonsterHunter) and weak_target_health <= target.get_hp():
+                target = weak_enemy
+                weak_target_health = target.get_hp()
+            else:
+                target = weak_enemy
+                weak_target_health = target.get_hp()
+
+
+        if self.get_hp() <  100:
             if not self.shield_status:
                 print("Поднимаю щит")
                 self.shield_up()
                 print()
                 return
-        elif self.get_hp() > 120:
+        elif self.get_hp() > 130:
             if self.shield_status:
                 print("Опускаю щит")
                 self.shield_down()
                 print()
                 return
         else:
-            print("Атакую ближнего -", enemies[0].name)
-            self.attack(enemies[0])
+            print("Атакую ближнего -", target.name)
+            self.attack(target)
         print('\n')
-
 
 
 class Attacker(Hero):
@@ -195,34 +262,65 @@ class Attacker(Hero):
     Класс Убийца. Родитель Герой.
     """
     # Убийца:
-    def __str__(self):
+    def __str__(self) -> str:
         return 'Name: {0} | HP: {1}'.format(self.name, self.get_hp())
+
+
     # Атрибуты:
-    def __init__(self, name):
+    def __init__(self, name: Optional[str]) -> None:
         super().__init__(name)
     # - коэффициент усиления урона (входящего и исходящего)
         self.power_multiply = 0.5
+
+
     # Методы:
-    # - атака - наносит урон равный показателю силы (self.__power) умноженному на коэффициент усиления урона (self.power_multiply)
-    # после нанесения урона - вызывается метод ослабления power_down.
-    def attack(self, target):
-        real_attack = self.get_power() * self.power_multiply
+    def attack(self, target: Monster) -> None:
+        """
+        Наносит урон равный показателю силы (self.__power) умноженному на
+        коэффициент усиления урона (self.power_multiply) после нанесения урона - вызывается метод ослабления power_down.
+        :param target: цель атаки
+        :type target: Monster
+        """
+        real_attack: float = self.get_power() * self.power_multiply
         target.take_damage(real_attack)
-    # - получение урона - получает урон равный входящему урона умноженному на половину коэффициента усиления урона - damage * (
-    # self.power_multiply / 2)
-    def take_damage(self, damage):
-        real_damage = damage * (self.power_multiply / 2)
+        self.power_down()
+
+
+    def take_damage(self, damage: float) -> None:
+        """
+        Получает урон равный входящему урона умноженному на половину
+        коэффициента усиления урона - damage * (self.power_multiply / 2).
+        :param damage: получаемый урон
+        :type damage: float
+        """
+        real_damage: float = damage * (self.power_multiply / 2)
         self.set_hp(self.get_hp() - real_damage)
         super().take_damage(real_damage)
-    # - усиление (power_up) - увеличивает коэффициента усиления урона в 2 раза
-    def power_up(self):
+
+
+    def power_up(self) -> None:
+        """
+        Увеличивает коэффициента усиления урона в 2 раза.
+        """
         self.power_multiply *= 2
-    # - ослабление (power_down) - уменьшает коэффициента усиления урона в 2 раза
-    def power_up(self):
+
+
+    def power_down(self) -> None:
+        """
+        Уменьшает коэффициента усиления урона в 2 раза.
+        """
         self.power_multiply /= 2
-    # - выбор действия - получает на вход всех союзников и всех врагов и на основе своей стратегии выполняет ОДНО из действий (атака,
-    # усиление, ослабление) на выбранную им цель
-    def make_a_move(self, friends, enemies):
+
+
+    def make_a_move(self, friends: list[Hero], enemies: list[Monster]) -> None:
+        """
+        Выбор действия - получает на вход всех союзников и всех врагов и на основе своей стратегии
+        выполняет ОДНО из действий (атака, усиление, ослабление) на выбранную им цель
+        :param friends: список союзников
+        :type friends: list[Hero]
+        :param enemies: список монстров
+        :type enemies: list[Monster]
+        """
         super().make_a_move(friends, enemies)
         print(self.name, end=' ')
 
@@ -230,18 +328,29 @@ class Attacker(Hero):
         if not enemies:
             return
 
+        target: Monster = enemies[0]
+        weak_target_health: float = target.get_hp()
+        for weak_enemy in enemies:
+            if isinstance(weak_enemy, MonsterHunter) and weak_target_health <= target.get_hp():
+                target = weak_enemy
+                weak_target_health = target.get_hp()
+            else:
+                target = weak_enemy
+                weak_target_health = target.get_hp()
+
+
         if self.power_multiply < 1 and self.get_hp() > 80:
             print("Усиление атаки!")
             self.power_up()
             print()
             return
-        elif self.power_multiply < 0.5:
+        elif self.power_multiply < 0.5 and self.get_power() < weak_target_health:
             print("Усиление атаки!")
             self.power_up()
             print()
             return
 
-        print("Атакую ближнего -", enemies[0].name)
-        self.attack(enemies[0])
+        print("Атакую ближнего -", target.name)
+        self.attack(target)
         print('\n')
 
