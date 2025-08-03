@@ -1,6 +1,10 @@
-# TODO здесь писать код
+import re
+from typing import List
 
-# В данном случае запрос request.get заменен на загрзку сайта из файла html
 with open('examples.html', 'r') as f:
     text = f.read()
-# По итогу вы так же получаете код сайта в виде одной строки
+
+pattern: str = r"<h3.*?>(.*?)</h3>"
+matches: List[str] = re.findall(pattern, text, re.DOTALL)
+headings: List[str] = [match.strip() for match in matches]
+print(headings)
